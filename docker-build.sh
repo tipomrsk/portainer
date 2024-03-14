@@ -44,9 +44,9 @@ docker_logout() {
     docker logout
 }
 
-# Function to build and push the image
-build_and_push_image() {
-    figlet_action "Building image"
+# Function to build image
+build_image() {
+    figlet_action "Building Image"
     docker build -t $1:$4 -f $2 $3
 
     if [ $? -ne 0 ]; then
@@ -54,9 +54,12 @@ build_and_push_image() {
         exit 1
     fi
     echo -e "${GREEN}Image build successful.${NC}"
+}
 
-    figlet_action "Pushing image"
-    docker push "$1":"$4"
+# Function to push image
+push_image() {
+    figlet_action "Pushing Image"
+    docker push "$1":"$2"
     if [ $? -ne 0 ]; then
         echo -e "${RED}Error pushing the image to Docker Hub.${NC}"
         exit 1
@@ -85,7 +88,8 @@ main() {
 
     # Execute operations
     docker_login
-    build_and_push_image "$image_name" "$dockerfile_path" "$code_dir" "$docker_version"
+    build_image "$image_name" "$dockerfile_path" "$code_dir" "$docker_version"
+    push_image "$image_name" "$docker_version"
     docker_logout
 
     echo -e "${GREEN}Process completed successfully.${NC}"
